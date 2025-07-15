@@ -1,3 +1,6 @@
+//GDPHYSX Phase 2 created by Rameses P. Amar, Arvin Lawrence B. Dacanay, Rafael Ira R. Villanueva
+//GDPHYSX XX22
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -9,8 +12,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-//Nice
 
 #include "Model.h"
 #include "Shader.h"
