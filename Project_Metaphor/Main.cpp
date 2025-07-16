@@ -33,6 +33,7 @@
 #include "P6/Rod.h"
 #include "P6/Bungee.h"
 #include "P6/Chain.h"
+#include "P6/FallingNCradle.h"
 
 #include <iostream>
 #include <string>
@@ -50,44 +51,103 @@ float x = 0.f, y = 0.f, z = -20.0f;
 
 bool stateControl = false;
 bool stateCam = true;
-
+bool forceApplied = false;
 
 float x_scale = 0.5f, y_scale = 0.5f, z_scale = 0.5f;
 float thetaX = 1.f, thetaY = 1.f;
 float x_axisX = 0.f, y_axisX = 1.f, z_axisX = 0.f;
 float x_axisY = 1.f, y_axisY = 0.f, z_axisY = 0.f;
 
-glm::vec3 cameraPos = glm::vec3(0, 0, 2.f);
+//initialize camera vars
+//glm::vec3 cameraPos = glm::vec3(0, 0, 2.f);
 glm::vec3 WorldUp = glm::vec3(0, 1.0f, 0);
 glm::vec3 Front = glm::vec3(0, 0.0f, -1);
+const float cameraRotateSpeed = 1.5f;       //degrees per key press/frame
+const float orbitRadius = 800.0f;        // distance from center
+const float heightOffset = 300.0f;       // camera height above center
 
-bool firstMouse = true;
 float pitch = 0.0f;
-float yaw = -90.0f;
-
+float yaw = 90.0f; // instead of -90.0f
 
 float lastX = 400, lastY = 400;
 
-float height = 600.0f; //800
-float width = 600.0f; //1200
+float height = 800.0f; //800
+float width = 800.0f; //1200
 
 Model main_object({ 0, 0, 0 });
 Model main_object2({ 0, 0, 0 });
+Model main_object3({ 0, 0, 0 });
+Model main_object4({ 0, 0, 0 });
+Model main_object5({ 0, 0, 0 });
 
 OrthoCamera orca({ 0,2,0 }, width, height);
 PerspectiveCamera perca({ 0,0,0 }, height, width);
 
 P6::PhysicsWorld pWorld = P6::PhysicsWorld();
 
-P6::P6Particle particle = P6::P6Particle(-150, 0, 0); //Position of Partile 1
-P6::P6Particle particle2 = P6::P6Particle(150, 0, 0); //Position of Partile 2
-
 P6::MyVector accumulatedAcceleration(0.f, 0.f, 0.f);
 
 
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+    if (glfwGetKey(window, GLFW_KEY_1)) //Change the camera into Orthographic Mode
+    {
+        stateCam = true;
+        std::cout << "Camera changed to Ortographic" << std::endl;
+    }
 
+    if (glfwGetKey(window, GLFW_KEY_2)) //Change the camera into Perspective Mode
+    {
+        stateCam = false;
+        std::cout << "Camera changed to Perspective" << std::endl;
+    }
+
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+    {
+        //will implement later but this will handlle the logic of starting the cradle by adding addForce to the 1st particle
+        forceApplied = true;
+        std::cout << "Force Applied" << std::endl;
+    }
+
+    if (!stateCam)   //Only rotate camera in perspective mode
+    {
+        bool updated = false;
+
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) //Rotate Right
+        {
+            yaw += cameraRotateSpeed;
+            updated = true;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) //Rotate Left
+        {
+            yaw -= cameraRotateSpeed;
+            updated = true;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) //Rotate Up
+        {
+            pitch += cameraRotateSpeed;
+            updated = true;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) //Rotate Down
+        {
+            pitch -= cameraRotateSpeed;
+            updated = true;
+        }
+
+        //Clamp the pitch to avoid flipping
+        if (pitch > 89.0f)
+        {
+            pitch = 89.0f;
+        }
+
+        if (pitch < -89.0f)
+        {
+            pitch = -89.0f;
+        }
+    }
 };
 
 int main(void)
@@ -109,6 +169,11 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
     gladLoadGL();
+
+    using clock = std::chrono::high_resolution_clock;
+    auto curr_time = clock::now();
+    auto prev_time = curr_time;
+    std::chrono::nanoseconds curr_ns(0);
 
     //Texture
     int img_width, img_height, colorChannels;
@@ -193,7 +258,8 @@ int main(void)
     };
 
     std::vector<GLfloat> fullVertexData;
-    for (int i = 0; i < shapes[0].mesh.indices.size(); i++) {
+    for (int i = 0; i < shapes[0].mesh.indices.size(); i++) 
+    {
         tinyobj::index_t vData = shapes[0].mesh.indices[i];
 
         fullVertexData.push_back(
@@ -301,30 +367,97 @@ int main(void)
 
     P6::MyVector sample(0.0f, 0.0f, 0.0f);
 
-    //particle.Velocity = P6::MyVector(0, -100, 0); 
-    //particle.Acceleration = P6::MyVector(0, 0, 0); 
-    particle.mass = 10.0f;
-    particle.radius = 90.0f;
-    particle.restitution = 1.0f;
-    particle.AddForce(P6::MyVector(50000, 0, 0)); //150k
+    float cableLength;
+    float pGap, pRadius;
+    //float particleRadius = 50.0f;
+    float gravityStr;
+    float pushX, pushY, pushZ;
 
-    //particle2.Velocity = P6::MyVector(0, -100, 0);
-    //particle2.Acceleration = P6::MyVector(0, 0, 0);
+    std::cout << "Cable Length: ";
+    std::cin >> cableLength;
+    std::cout << "Particle Gap: ";
+    std::cin >> pGap;
+    std::cout << "Particle Radius: ";
+    std::cin >> pRadius;
+    std::cout << "Gravity Strength: ";
+    std::cin >> gravityStr;
+
+    std::cout << "Apply Force" << std::endl;
+    std::cout << "X: ";
+    std::cin >> pushX;
+    std::cout << "Y: ";
+    std::cin >> pushY;
+    std::cout << "Z: ";
+    std::cin >> pushZ;
+
+    //Calculate starting x so particles are centered
+    float startX = -2 * pGap;
+
+	float Pos1X = startX; //Position of the first particle
+	float Pos2X = startX + pGap; //Position of the second particle
+	float Pos3X = startX + 2 * pGap; //Position of the third particle
+	float Pos4X = startX + 3 * pGap; //Position of the fourth particle
+	float Pos5X = startX + 4 * pGap; //Position of the fifth particle
+
+    P6::P6Particle particle = P6::P6Particle(Pos1X, 0, 0);      //Particle 1
+	P6::P6Particle particle2 = P6::P6Particle(Pos2X, 0, 0);     //Particle 2
+    P6::P6Particle particle3 = P6::P6Particle(Pos3X, 0, 0);     //Particle 3
+    P6::P6Particle particle4 = P6::P6Particle(Pos4X, 0, 0);     //Particle 4
+    P6::P6Particle particle5 = P6::P6Particle(Pos5X, 0, 0);     //Particle 5
+
+    pWorld.setGravity(gravityStr);
+
+    //Particle 1 (this is where 
+    particle.mass = 10.0f;
+    particle.radius = pRadius;
+    particle.restitution = 1.0f;
+
+    if (forceApplied)
+    {
+        particle.AddForce(P6::MyVector(pushX, pushY, pushZ)); //Apply force to the first particle
+
+    }
+
     particle2.mass = 10.0f; //100
-    particle2.radius = 100.0f;
+    particle2.radius = pRadius;
     particle2.restitution = 1.0f;
-    //particle2.AddForce(P6::MyVector(0, 0, 0));
+
+    particle3.mass = 10.0f;
+    particle3.radius = pRadius;
+    particle.restitution = 1.0f;
+
+	particle4.mass = 10.0f;
+	particle4.radius = pRadius;
+    particle.restitution = 1.0f;
+
+	particle5.mass = 10.0f;
+	particle5.radius = pRadius;
+	particle5.restitution = 1.0f;
 
     pWorld.AddParticle(&particle);
     pWorld.AddParticle(&particle2);
+	pWorld.AddParticle(&particle3);
+	pWorld.AddParticle(&particle4);
+	pWorld.AddParticle(&particle5);
 
     main_object.setScale(glm::vec3(particle.radius, particle.radius, particle.radius));
     main_object2.setScale(glm::vec3(particle2.radius, particle2.radius, particle2.radius));
+	main_object3.setScale(glm::vec3(particle3.radius, particle3.radius, particle3.radius));
+	main_object4.setScale(glm::vec3(particle4.radius, particle4.radius, particle4.radius));
+	main_object5.setScale(glm::vec3(particle5.radius, particle5.radius, particle5.radius));
 
-    using clock = std::chrono::high_resolution_clock;
-    auto curr_time = clock::now();
-    auto prev_time = curr_time;
-    std::chrono::nanoseconds curr_ns(0);
+    FallingNCradle fNC1 = FallingNCradle(P6::MyVector(Pos1X - 10.0f, 0, 0), cableLength);
+    FallingNCradle fNC2 = FallingNCradle(P6::MyVector(Pos2X - 10.0f, 0, 0), cableLength);
+    FallingNCradle fNC3 = FallingNCradle(P6::MyVector(Pos3X - 10.0f, 0, 0), cableLength);
+    FallingNCradle fNC4 = FallingNCradle(P6::MyVector(Pos4X - 10.0f, 0, 0), cableLength);
+    FallingNCradle fNC5 = FallingNCradle(P6::MyVector(Pos5X - 10.0f, 0, 0), cableLength);
+
+    pWorld.forceRegistry.Add(&particle, &fNC1);
+	pWorld.forceRegistry.Add(&particle2, &fNC2);
+	pWorld.forceRegistry.Add(&particle3, &fNC3);
+	pWorld.forceRegistry.Add(&particle4, &fNC4);
+	pWorld.forceRegistry.Add(&particle5, &fNC5);
+
 
     //P6::ParticleContact contact = P6::ParticleContact();
     //contact.particles[0] = &particle;
@@ -388,6 +521,19 @@ int main(void)
 
         main_object.setPosition(glm::vec3(particle.Position.x, particle.Position.y, particle.Position.z));
         main_object2.setPosition(glm::vec3(particle2.Position.x, particle2.Position.y, particle2.Position.z));
+		main_object3.setPosition(glm::vec3(particle3.Position.x, particle3.Position.y, particle3.Position.z));
+		main_object4.setPosition(glm::vec3(particle4.Position.x, particle4.Position.y, particle4.Position.z));
+		main_object5.setPosition(glm::vec3(particle5.Position.x, particle5.Position.y, particle5.Position.z));
+
+        glm::vec3 centerPoint = (main_object.getPosition() + main_object2.getPosition() + main_object3.getPosition() + main_object4.getPosition() + main_object5.getPosition()) / 5.0f;
+        glm::vec3 offset;
+        offset.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch)) * orbitRadius;
+        offset.y = sin(glm::radians(pitch)) * orbitRadius + heightOffset;
+        offset.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch)) * orbitRadius;
+
+        glm::vec3 camPos = centerPoint + offset;
+        perca.setCameraPos(camPos);
+        perca.setFront(glm::normalize(centerPoint - camPos));
 
         if (stateCam)
         {
@@ -409,20 +555,41 @@ int main(void)
         {
             main_object.setCamera(orca.getProjection(), orca.getCameraPos(), orca.getFront(), orca.getViewMat());
             main_object2.setCamera(orca.getProjection(), orca.getCameraPos(), orca.getFront(), orca.getViewMat());
+			main_object3.setCamera(orca.getProjection(), orca.getCameraPos(), orca.getFront(), orca.getViewMat());
+			main_object4.setCamera(orca.getProjection(), orca.getCameraPos(), orca.getFront(), orca.getViewMat());
+			main_object5.setCamera(orca.getProjection(), orca.getCameraPos(), orca.getFront(), orca.getViewMat());
         }
 
         else  
         {
             main_object.setCamera(perca.getProjection(), perca.getCameraPos(), perca.getFront(), perca.getViewMat());
+            main_object2.setCamera(perca.getProjection(), perca.getCameraPos(), perca.getFront(), perca.getViewMat());
+            main_object3.setCamera(perca.getProjection(), perca.getCameraPos(), perca.getFront(), perca.getViewMat());
+            main_object4.setCamera(perca.getProjection(), perca.getCameraPos(), perca.getFront(), perca.getViewMat());
+            main_object5.setCamera(perca.getProjection(), perca.getCameraPos(), perca.getFront(), perca.getViewMat());
         }
 
-       
         mainObjShader.use();
-        mainObjShader.setVec4("objectColor", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)); 
+        
+        //Particle 1
+        mainObjShader.setVec4("objectColor", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)); //red
         main_object.mainDraw(&mainObjShader, &VAO, &fullVertexData);
 
-        mainObjShader.setVec4("objectColor", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+        //Particle 2
+        mainObjShader.setVec4("objectColor", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)); //green
         main_object2.mainDraw(&mainObjShader, &VAO, &fullVertexData);
+
+        //Particle 3
+		mainObjShader.setVec4("objectColor", glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)); //blue
+		main_object3.mainDraw(&mainObjShader, &VAO, &fullVertexData);
+
+        //Particle 4
+		mainObjShader.setVec4("objectColor", glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)); //yellow
+        main_object4.mainDraw(&mainObjShader, &VAO, &fullVertexData);
+
+        //Particle 5
+		mainObjShader.setVec4("objectColor", glm::vec4(1.0f, 0.65f, 0.0f, 1.0f)); //orange
+        main_object5.mainDraw(&mainObjShader, &VAO, &fullVertexData);
 
         glfwSwapBuffers(window);
 

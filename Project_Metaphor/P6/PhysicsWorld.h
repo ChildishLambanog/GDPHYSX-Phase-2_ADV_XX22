@@ -23,6 +23,7 @@ namespace P6 {
 
 			void AddContact(P6Particle* p1, P6Particle* p2, float restitution, MyVector contactNormal, float depth);
 			std::list<ParticleLink*> Links;
+			void setGravity(float gravityStr);
 
 		private:
 			void UpdateParticleList();

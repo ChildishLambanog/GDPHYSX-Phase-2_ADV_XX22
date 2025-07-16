@@ -41,6 +41,11 @@ void P6::PhysicsWorld::AddContact(P6Particle* p1, P6Particle* p2, float restitut
 	Contacts.push_back(toAdd);
 }
 
+void P6::PhysicsWorld::setGravity(float gravityStr)
+{
+	this->Gravity = GravityForceGenerator(MyVector(0, gravityStr, 0));
+}
+
 void P6::PhysicsWorld::UpdateParticleList()
 {
 	Particles.remove_if([](P6Particle* p) { return p->IsDestroyed(); });
@@ -70,7 +75,7 @@ void P6::PhysicsWorld::GetOverlaps()
 
 				float resitution = fmin((*a)->restitution, (*b)->restitution);
 				AddContact(*a, *b, resitution, dir, depth);
-				std::cout << "mag2: " << mag2 << std::endl;
+				//std::cout << "mag2: " << mag2 << std::endl;
 			}
 
 			

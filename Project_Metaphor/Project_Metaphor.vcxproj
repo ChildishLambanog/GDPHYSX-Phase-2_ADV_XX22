@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="P6\FallingNCradle.cpp" />
     <ClCompile Include="P6\Chain.cpp" />
     <ClCompile Include="P6\Bungee.cpp" />
     <ClCompile Include="P6\AnchoredSpring.cpp" />
@@ -169,6 +170,7 @@
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="P6\FallingNCradle.h" />
     <ClInclude Include="P6\Chain.h" />
     <ClInclude Include="P6\Bungee.h" />
     <ClInclude Include="P6\AnchoredSpring.h" />
