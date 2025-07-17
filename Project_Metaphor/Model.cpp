@@ -19,11 +19,12 @@ Model::Model(glm::vec3 position)
         1000.f                 //zfar
     );
 
-    this->cameraPos = glm::vec3(0.0f, 0.0f, 2.0f); //0.0f, 0.0f, 2.f
+    this->cameraPos = glm::vec3(0.0f, 0.0f, 500.0f); //0.0f, 0.0f, 2.f
     this->WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
-    this->Front = glm::vec3(0.0f, 0.0f, -1.0f); 
+    this->Front = glm::vec3(0.0f, 0.0f, -1.0f); //0.0f, 0.0f, -1.0f
 
-    this->viewMatrix = glm::lookAt(this->cameraPos, this->cameraPos + this->Front, this->WorldUp);
+    //this->viewMatrix = glm::lookAt(this->cameraPos, this->cameraPos + this->Front, this->WorldUp);
+    this->viewMatrix = glm::lookAt(this->cameraPos, glm::vec3(0.0f, 0.0f, 0.0f), this->WorldUp);
 }
 
 void Model::draw(GLuint* shaderProg, GLuint* VAO, std::vector<GLfloat>* fullVertexData)

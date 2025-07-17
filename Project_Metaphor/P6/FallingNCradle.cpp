@@ -6,22 +6,16 @@ void FallingNCradle::UpdateForce(P6Particle* particle, float time)
     MyVector force = pos - anchorPoint;
     float mag = force.magnitude();
 
-	if (mag < restLength) //If less than restLength just free fall
+    if (mag <= restLength)
     {
+        // Particle hasn't reached chain length yet; let gravity do its thing
         return;
     }
 
-    //Chain is taut: clamp position and behave like rod
+    // Once the chain is taut, prevent further movement away from the anchor
     MyVector direction = force.normalize();
-
-    //Snap position to restLength from anchor
     particle->Position = anchorPoint + (direction * restLength);
 
-    //Remove any velocity component pointing outward
-    float outwardVel = particle->Velocity.dotProduct(direction);
-    
-    if (outwardVel > 0)
-    {
-        particle->Velocity -= direction * outwardVel;
-    }
+    // Also reset velocity perpendicular to the rod to avoid energy buildup
+    particle->Velocity = particle->Velocity - direction * particle->Velocity.dotProduct(direction);
 }

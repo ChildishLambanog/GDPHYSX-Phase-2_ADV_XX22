@@ -392,20 +392,29 @@ int main(void)
 
     //Calculate starting x so particles are centered
     float startX = -2 * pGap;
+    float startY = cableLength;
 
-	float Pos1X = startX; //Position of the first particle
-	float Pos2X = startX + pGap; //Position of the second particle
-	float Pos3X = startX + 2 * pGap; //Position of the third particle
-	float Pos4X = startX + 3 * pGap; //Position of the fourth particle
-	float Pos5X = startX + 4 * pGap; //Position of the fifth particle
+	float Pos1X = startX;               //Position of the first particle
+	float Pos2X = startX + pGap;        //Position of the second particle
+	float Pos3X = startX + 2 * pGap;    //Position of the third particle
+	float Pos4X = startX + 3 * pGap;    //Position of the fourth particle
+	float Pos5X = startX + 4 * pGap;    //Position of the fifth particle
 
-    P6::P6Particle particle = P6::P6Particle(Pos1X, 0, 0);      //Particle 1
-	P6::P6Particle particle2 = P6::P6Particle(Pos2X, 0, 0);     //Particle 2
-    P6::P6Particle particle3 = P6::P6Particle(Pos3X, 0, 0);     //Particle 3
-    P6::P6Particle particle4 = P6::P6Particle(Pos4X, 0, 0);     //Particle 4
-    P6::P6Particle particle5 = P6::P6Particle(Pos5X, 0, 0);     //Particle 5
+    P6::P6Particle particle = P6::P6Particle(Pos1X, 200 - cableLength, 0);      //Particle 1
+	P6::P6Particle particle2 = P6::P6Particle(Pos2X, 200 - cableLength, 0);     //Particle 2
+    P6::P6Particle particle3 = P6::P6Particle(Pos3X, 200 - cableLength, 0);     //Particle 3
+    P6::P6Particle particle4 = P6::P6Particle(Pos4X, 200 - cableLength, 0);     //Particle 4
+    P6::P6Particle particle5 = P6::P6Particle(Pos5X, 200 - cableLength, 0);     //Particle 5
 
-    pWorld.setGravity(gravityStr);
+    //pWorld.setGravity(gravityStr);
+
+    // After creating particles and before the simulation loop
+    //P6::GravityForceGenerator gravity(P6::MyVector(0, 0, gravityStr));
+    //pWorld.forceRegistry.Add(&particle, &gravity);
+    //pWorld.forceRegistry.Add(&particle2, &gravity);
+    //pWorld.forceRegistry.Add(&particle3, &gravity);
+    //pWorld.forceRegistry.Add(&particle4, &gravity);
+    //pWorld.forceRegistry.Add(&particle5, &gravity);
 
     //Particle 1 (this is where 
     particle.mass = 10.0f;
@@ -446,55 +455,17 @@ int main(void)
 	main_object4.setScale(glm::vec3(particle4.radius, particle4.radius, particle4.radius));
 	main_object5.setScale(glm::vec3(particle5.radius, particle5.radius, particle5.radius));
 
-    FallingNCradle fNC1 = FallingNCradle(P6::MyVector(Pos1X - 10.0f, 0, 0), cableLength);
-    FallingNCradle fNC2 = FallingNCradle(P6::MyVector(Pos2X - 10.0f, 0, 0), cableLength);
-    FallingNCradle fNC3 = FallingNCradle(P6::MyVector(Pos3X - 10.0f, 0, 0), cableLength);
-    FallingNCradle fNC4 = FallingNCradle(P6::MyVector(Pos4X - 10.0f, 0, 0), cableLength);
-    FallingNCradle fNC5 = FallingNCradle(P6::MyVector(Pos5X - 10.0f, 0, 0), cableLength);
+    FallingNCradle fNC1 = FallingNCradle(P6::MyVector(Pos1X, 200, 0), cableLength);
+    FallingNCradle fNC2 = FallingNCradle(P6::MyVector(Pos2X, 200, 0), cableLength);
+    FallingNCradle fNC3 = FallingNCradle(P6::MyVector(Pos3X, 200, 0), cableLength);
+    FallingNCradle fNC4 = FallingNCradle(P6::MyVector(Pos4X, 200, 0), cableLength);
+    FallingNCradle fNC5 = FallingNCradle(P6::MyVector(Pos5X, 200, 0), cableLength);
 
     pWorld.forceRegistry.Add(&particle, &fNC1);
 	pWorld.forceRegistry.Add(&particle2, &fNC2);
 	pWorld.forceRegistry.Add(&particle3, &fNC3);
 	pWorld.forceRegistry.Add(&particle4, &fNC4);
 	pWorld.forceRegistry.Add(&particle5, &fNC5);
-
-
-    //P6::ParticleContact contact = P6::ParticleContact();
-    //contact.particles[0] = &particle;
-	//contact.particles[1] = &particle2;
-
-	//contact.contactNormal = particle.Position - particle2.Position;
-	//contact.contactNormal = contact.contactNormal.normalize();
-
-    //contact.restitution = 1.0f;
-
-    //pWorld.AddContact(&particle, &particle2,1.0f,(particle.Position - particle2.Position).normalize());
-
-    //particle.Velocity = P6::MyVector(-60, 0, 0);
-    //particle2.Velocity = P6::MyVector(15, 0, 0);
-
-    //AnchoredSpring aSpring = AnchoredSpring(MyVector(20, 0, 0), 5, 0.5);
-    //pWorld.forceRegistry.Add(&particle, &aSpring);
-
-    //ParticleSpring pS = ParticleSpring(&particle, 5, 1);
-    //pWorld.forceRegistry.Add(&particle2, &pS);
-
-    //ParticleSpring pS2 = ParticleSpring(&particle2, 5, 1);
-    //pWorld.forceRegistry.Add(&particle, &pS2);
-
-    //particle.AddForce(P6::MyVector(0.0f, 1.0f, 0.0f) * 500000);
-    //Rod* r = new Rod();
-    //r->particles[0] = &particle;
-    //r->particles[1] = &particle2;
-    //r->length = 200;
-
-    //pWorld.Links.push_back(r);
-
-    //Bungee bungee = Bungee(P6::MyVector(-150, 0, 0), 5, 200);
-    //pWorld.forceRegistry.Add(&particle, &bungee);
-
-	//Chain chain = Chain(P6::MyVector(150, 0, 0), 200);
-	//pWorld.forceRegistry.Add(&particle2, &chain);
 
     while (!glfwWindowShouldClose(window))
     {
