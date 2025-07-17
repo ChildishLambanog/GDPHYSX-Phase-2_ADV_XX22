@@ -400,32 +400,27 @@ int main(void)
 	float Pos4X = startX + 3 * pGap;    //Position of the fourth particle
 	float Pos5X = startX + 4 * pGap;    //Position of the fifth particle
 
-    P6::P6Particle particle = P6::P6Particle(Pos1X, 200 - cableLength, 0);      //Particle 1
-	P6::P6Particle particle2 = P6::P6Particle(Pos2X, 200 - cableLength, 0);     //Particle 2
-    P6::P6Particle particle3 = P6::P6Particle(Pos3X, 200 - cableLength, 0);     //Particle 3
-    P6::P6Particle particle4 = P6::P6Particle(Pos4X, 200 - cableLength, 0);     //Particle 4
-    P6::P6Particle particle5 = P6::P6Particle(Pos5X, 200 - cableLength, 0);     //Particle 5
+    P6::P6Particle particle = P6::P6Particle(Pos1X, 200 + cableLength, 0);      //Particle 1
+	P6::P6Particle particle2 = P6::P6Particle(Pos2X, 200, 0);     //Particle 2
+    P6::P6Particle particle3 = P6::P6Particle(Pos3X, 200, 0);     //Particle 3
+    P6::P6Particle particle4 = P6::P6Particle(Pos4X, 200, 0);     //Particle 4
+    P6::P6Particle particle5 = P6::P6Particle(Pos5X, 200, 0);     //Particle 5
 
     //pWorld.setGravity(gravityStr);
 
     // After creating particles and before the simulation loop
     //P6::GravityForceGenerator gravity(P6::MyVector(0, 0, gravityStr));
-    //pWorld.forceRegistry.Add(&particle, &gravity);
-    //pWorld.forceRegistry.Add(&particle2, &gravity);
-    //pWorld.forceRegistry.Add(&particle3, &gravity);
-    //pWorld.forceRegistry.Add(&particle4, &gravity);
-    //pWorld.forceRegistry.Add(&particle5, &gravity);
+    P6::GravityForceGenerator gravity(P6::MyVector(0, gravityStr, 0));
+    pWorld.forceRegistry.Add(&particle, &gravity);
+    pWorld.forceRegistry.Add(&particle2, &gravity);
+    pWorld.forceRegistry.Add(&particle3, &gravity);
+    pWorld.forceRegistry.Add(&particle4, &gravity);
+    pWorld.forceRegistry.Add(&particle5, &gravity);
 
     //Particle 1 (this is where 
     particle.mass = 10.0f;
     particle.radius = pRadius;
     particle.restitution = 1.0f;
-
-    if (forceApplied)
-    {
-        particle.AddForce(P6::MyVector(pushX, pushY, pushZ)); //Apply force to the first particle
-
-    }
 
     particle2.mass = 10.0f; //100
     particle2.radius = pRadius;
@@ -480,6 +475,16 @@ int main(void)
             auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(curr_ns);
 
             curr_ns -= timestep;
+
+            if (forceApplied)
+            {
+                //particle.AddForce(P6::MyVector(pushX, pushY, pushZ)); //Apply force to the first particle
+                particle.AddForce(P6::MyVector(-100000, 0, 0));
+                forceApplied = false;
+            }
+
+            pWorld.setGravity(gravityStr);
+
             particle.Acceleration += accumulatedAcceleration;
 
             pWorld.Update((float)ms.count() / 1000);

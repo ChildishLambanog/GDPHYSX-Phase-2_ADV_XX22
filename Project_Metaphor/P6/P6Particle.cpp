@@ -34,5 +34,5 @@ void P6::P6Particle::AddForce(MyVector force)
 void P6::P6Particle::ResetForce()
 {
 	this->accumulatedForce = MyVector(0, 0, 0);
-	this->Acceleration = MyVector(0, 0, 0);
+	//this->Acceleration = MyVector(0, 0, 0);
 }
