@@ -27,7 +27,7 @@ namespace P6 {
 
 		private:
 			void UpdateParticleList();
-			GravityForceGenerator Gravity = GravityForceGenerator(MyVector(0, -9.8f, 0)); //0, -9.8f, 0
+			GravityForceGenerator Gravity = GravityForceGenerator(MyVector(0, -0.0000098f, 0)); //0, -9.8f, 0
 		protected:
 			ContactResolver contactResolver = ContactResolver(20);
 			void GetOverlaps();

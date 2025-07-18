@@ -4,7 +4,7 @@
 void P6::PhysicsWorld::AddParticle(P6Particle* toAdd)
 {
 	this->Particles.push_back(toAdd);
-	//forceRegistry.Add(toAdd, &Gravity); //comment when you want to remove gravity
+	forceRegistry.Add(toAdd, &Gravity); //comment when you want to remove gravity
 }
 
 void P6::PhysicsWorld::Update(float time)

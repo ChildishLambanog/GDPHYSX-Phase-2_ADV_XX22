@@ -400,7 +400,7 @@ int main(void)
 	float Pos4X = startX + 3 * pGap;    //Position of the fourth particle
 	float Pos5X = startX + 4 * pGap;    //Position of the fifth particle
 
-    P6::P6Particle particle = P6::P6Particle(Pos1X, 200 + cableLength, 0);      //Particle 1
+    P6::P6Particle particle = P6::P6Particle(Pos1X, 200 /*+ cableLength*/, 0);      //Particle 1
 	P6::P6Particle particle2 = P6::P6Particle(Pos2X, 200, 0);     //Particle 2
     P6::P6Particle particle3 = P6::P6Particle(Pos3X, 200, 0);     //Particle 3
     P6::P6Particle particle4 = P6::P6Particle(Pos4X, 200, 0);     //Particle 4
@@ -411,32 +411,32 @@ int main(void)
     // After creating particles and before the simulation loop
     //P6::GravityForceGenerator gravity(P6::MyVector(0, 0, gravityStr));
     P6::GravityForceGenerator gravity(P6::MyVector(0, gravityStr, 0));
-    pWorld.forceRegistry.Add(&particle, &gravity);
-    pWorld.forceRegistry.Add(&particle2, &gravity);
-    pWorld.forceRegistry.Add(&particle3, &gravity);
-    pWorld.forceRegistry.Add(&particle4, &gravity);
-    pWorld.forceRegistry.Add(&particle5, &gravity);
+    //pWorld.forceRegistry.Add(&particle, &gravity);
+    //pWorld.forceRegistry.Add(&particle2, &gravity);
+    //pWorld.forceRegistry.Add(&particle3, &gravity);
+    //pWorld.forceRegistry.Add(&particle4, &gravity);
+    //pWorld.forceRegistry.Add(&particle5, &gravity);
 
     //Particle 1 (this is where 
     particle.mass = 10.0f;
     particle.radius = pRadius;
-    particle.restitution = 1.0f;
+    particle.restitution = 0.f;
 
     particle2.mass = 10.0f; //100
     particle2.radius = pRadius;
-    particle2.restitution = 1.0f;
+    particle2.restitution = 0.f;
 
     particle3.mass = 10.0f;
     particle3.radius = pRadius;
-    particle.restitution = 1.0f;
+    particle.restitution = 0.f;
 
 	particle4.mass = 10.0f;
 	particle4.radius = pRadius;
-    particle.restitution = 1.0f;
+    particle.restitution = 0.f;
 
 	particle5.mass = 10.0f;
 	particle5.radius = pRadius;
-	particle5.restitution = 1.0f;
+	particle5.restitution = 0.f;
 
     pWorld.AddParticle(&particle);
     pWorld.AddParticle(&particle2);
@@ -456,11 +456,29 @@ int main(void)
     FallingNCradle fNC4 = FallingNCradle(P6::MyVector(Pos4X, 200, 0), cableLength);
     FallingNCradle fNC5 = FallingNCradle(P6::MyVector(Pos5X, 200, 0), cableLength);
 
+	Chain chain1 = Chain(P6::MyVector(Pos1X, 200, 0), cableLength);
+	Chain chain2 = Chain(P6::MyVector(Pos2X, 200, 0), cableLength);
+	Chain chain3 = Chain(P6::MyVector(Pos3X, 200, 0), cableLength);
+	Chain chain4 = Chain(P6::MyVector(Pos4X, 200, 0), cableLength);
+	Chain chain5 = Chain(P6::MyVector(Pos5X, 200, 0), cableLength);
+
     pWorld.forceRegistry.Add(&particle, &fNC1);
 	pWorld.forceRegistry.Add(&particle2, &fNC2);
 	pWorld.forceRegistry.Add(&particle3, &fNC3);
 	pWorld.forceRegistry.Add(&particle4, &fNC4);
 	pWorld.forceRegistry.Add(&particle5, &fNC5);
+
+	/*pWorld.forceRegistry.Add(&particle, &chain1);
+	pWorld.forceRegistry.Add(&particle2, &chain2);
+	pWorld.forceRegistry.Add(&particle3, &chain3);
+	pWorld.forceRegistry.Add(&particle4, &chain4);
+	pWorld.forceRegistry.Add(&particle5, &chain5);*/
+
+	/*std::cout << "particle 1 position: " << particle.Position.x << ", " << particle.Position.y << ", " << particle.Position.z << std::endl;
+	std::cout << "particle 2 position: " << particle2.Position.x << ", " << particle2.Position.y << ", " << particle2.Position.z << std::endl;
+	std::cout << "particle 3 position: " << particle3.Position.x << ", " << particle3.Position.y << ", " << particle3.Position.z << std::endl;
+	std::cout << "particle 4 position: " << particle4.Position.x << ", " << particle4.Position.y << ", " << particle4.Position.z << std::endl;
+	std::cout << "particle 5 position: " << particle5.Position.x << ", " << particle5.Position.y << ", " << particle5.Position.z << std::endl;*/
 
     while (!glfwWindowShouldClose(window))
     {
@@ -472,6 +490,7 @@ int main(void)
 
         if (curr_ns >= timestep)
         {
+            //std::cout << "particle 1 position: " << particle.Position.x << ", " << particle.Position.y << ", " << particle.Position.z << std::endl;
             auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(curr_ns);
 
             curr_ns -= timestep;
@@ -479,11 +498,11 @@ int main(void)
             if (forceApplied)
             {
                 //particle.AddForce(P6::MyVector(pushX, pushY, pushZ)); //Apply force to the first particle
-                particle.AddForce(P6::MyVector(-100000, 0, 0));
+                particle.AddForce(P6::MyVector(-100, 0, 0));
                 forceApplied = false;
             }
 
-            pWorld.setGravity(gravityStr);
+            //pWorld.setGravity(gravityStr); 
 
             particle.Acceleration += accumulatedAcceleration;
 
