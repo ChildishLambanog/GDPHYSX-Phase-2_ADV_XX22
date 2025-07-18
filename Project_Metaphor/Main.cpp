@@ -373,6 +373,7 @@ int main(void)
     //float particleRadius = 50.0f;
     float gravityStr;
     float pushX, pushY, pushZ;
+    float forceMultiplier;
 
     std::cout << "Cable Length: ";
     std::cin >> cableLength;
@@ -390,6 +391,8 @@ int main(void)
     std::cin >> pushY;
     std::cout << "Z: ";
     std::cin >> pushZ;
+	std::cout << "Force Multiplier: ";
+	std::cin >> forceMultiplier;
 
     //Calculate starting x so particles are centered
     float startX = -2 * pGap;
@@ -411,7 +414,9 @@ int main(void)
 
     // After creating particles and before the simulation loop
     //P6::GravityForceGenerator gravity(P6::MyVector(0, 0, gravityStr));
-    P6::GravityForceGenerator gravity(P6::MyVector(0, gravityStr, 0));
+
+   // P6::GravityForceGenerator gravity(P6::MyVector(0, gravityStr * -9.8, 0));
+
     //pWorld.forceRegistry.Add(&particle, &gravity);
     //pWorld.forceRegistry.Add(&particle2, &gravity);
     //pWorld.forceRegistry.Add(&particle3, &gravity);
@@ -419,31 +424,32 @@ int main(void)
     //pWorld.forceRegistry.Add(&particle5, &gravity);
 
     //Particle 1 (this is where 
-    particle.mass = 10.0f;
+    particle.mass = 50;
     particle.radius = pRadius;
-    particle.restitution = 1.f;
+    particle.restitution = .9f;
 
-    particle2.mass = 10.0f; //100
+    particle2.mass = 50; //100
     particle2.radius = pRadius;
-    particle2.restitution = 1.f;
+    particle2.restitution = .9f;
 
-    particle3.mass = 10.0f;
+    particle3.mass = 50;
     particle3.radius = pRadius;
-    particle.restitution = 1.f;
+    particle.restitution = .9f;
 
-	particle4.mass = 10.0f;
+	particle4.mass = 50;
 	particle4.radius = pRadius;
-    particle.restitution = 1.f;
+    particle.restitution = .9f;
 
-	particle5.mass = 10.0f;
+	particle5.mass = 50;
 	particle5.radius = pRadius;
-	particle5.restitution = 1.f;
+	particle5.restitution = .9f;
 
     pWorld.AddParticle(&particle);
     pWorld.AddParticle(&particle2);
 	pWorld.AddParticle(&particle3);
 	pWorld.AddParticle(&particle4);
 	pWorld.AddParticle(&particle5);
+	pWorld.gravMULT(gravityStr); // Set the gravity strength in the physics world
 
     main_object.setScale(glm::vec3(particle.radius, particle.radius, particle.radius));
     main_object2.setScale(glm::vec3(particle2.radius, particle2.radius, particle2.radius));
@@ -516,8 +522,8 @@ int main(void)
 
             if (forceApplied)
             {
-                //particle.AddForce(P6::MyVector(pushX, pushY, pushZ)); //Apply force to the first particle
-                particle.AddForce(P6::MyVector(-10000, 0, 0)); //-100, 0, 0
+                particle.AddForce(P6::MyVector(pushX*forceMultiplier, pushY * forceMultiplier, pushZ * forceMultiplier)); //Apply force to the first particle
+              //  particle.AddForce(P6::MyVector(-10000, 0, 0)); //-100, 0, 0
                 forceApplied = false;
             }
 

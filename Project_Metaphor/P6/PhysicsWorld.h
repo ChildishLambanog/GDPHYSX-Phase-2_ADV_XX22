@@ -13,7 +13,7 @@ namespace P6 {
 	{
 		public:
 			ForceRegistry forceRegistry;
-
+			
 			std::list<P6Particle*> Particles;
 
 			void AddParticle(P6Particle* toAdd);
@@ -25,11 +25,21 @@ namespace P6 {
 			std::list<ParticleLink*> Links;
 			void setGravity(float gravityStr);
 
+			float baseGRAVITY = -9.8f; // Default gravity strength
+
+			void gravMULT(float multiple) {
+				this->baseGRAVITY *= multiple;
+				setGravity(baseGRAVITY);
+			}
+
+			GravityForceGenerator Gravity = GravityForceGenerator(MyVector(0, baseGRAVITY, 0)); //0, -9.8f, 0
+
+
 		private:
 			void UpdateParticleList();
-			GravityForceGenerator Gravity = GravityForceGenerator(MyVector(0, -9.8f, 0)); //0, -9.8f, 0
 		protected:
 			ContactResolver contactResolver = ContactResolver(20);
+
 			void GetOverlaps();
 			void GenerateContacts();
 	};
