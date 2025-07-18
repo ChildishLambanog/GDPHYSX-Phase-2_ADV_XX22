@@ -381,7 +381,7 @@ int main(void)
     std::cin >> pGap;
     std::cout << "Particle Radius: ";
     std::cin >> pRadius;
-    std::cout << "Gravity Strength: ";
+    std::cout << "Gravity Strength (This a multiplier for the base gravity -9.8): ";
     std::cin >> gravityStr;
 
     std::cout << "Apply Force" << std::endl;
@@ -391,7 +391,7 @@ int main(void)
     std::cin >> pushY;
     std::cout << "Z: ";
     std::cin >> pushZ;
-	std::cout << "Force Multiplier: ";
+	std::cout << "Force Multiplier (Use a negative value to make the particle go left if X Force is positive): ";
 	std::cin >> forceMultiplier;
 
     //Calculate starting x so particles are centered
