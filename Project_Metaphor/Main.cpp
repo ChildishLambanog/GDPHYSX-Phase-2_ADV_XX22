@@ -34,6 +34,7 @@
 #include "P6/Bungee.h"
 #include "P6/Chain.h"
 #include "P6/FallingNCradle.h"
+#include "P6/LineRender.h"
 
 #include <iostream>
 #include <string>
@@ -420,23 +421,23 @@ int main(void)
     //Particle 1 (this is where 
     particle.mass = 10.0f;
     particle.radius = pRadius;
-    particle.restitution = 0.f;
+    particle.restitution = 1.f;
 
     particle2.mass = 10.0f; //100
     particle2.radius = pRadius;
-    particle2.restitution = 0.f;
+    particle2.restitution = 1.f;
 
     particle3.mass = 10.0f;
     particle3.radius = pRadius;
-    particle.restitution = 0.f;
+    particle.restitution = 1.f;
 
 	particle4.mass = 10.0f;
 	particle4.radius = pRadius;
-    particle.restitution = 0.f;
+    particle.restitution = 1.f;
 
 	particle5.mass = 10.0f;
 	particle5.radius = pRadius;
-	particle5.restitution = 0.f;
+	particle5.restitution = 1.f;
 
     pWorld.AddParticle(&particle);
     pWorld.AddParticle(&particle2);
@@ -449,6 +450,13 @@ int main(void)
 	main_object3.setScale(glm::vec3(particle3.radius, particle3.radius, particle3.radius));
 	main_object4.setScale(glm::vec3(particle4.radius, particle4.radius, particle4.radius));
 	main_object5.setScale(glm::vec3(particle5.radius, particle5.radius, particle5.radius));
+
+    LineRender line1(P6::MyVector(Pos1X, 200, 0), particle.Position, glm::mat4(1.f));
+	LineRender line2(P6::MyVector(Pos2X, 200, 0), particle2.Position, glm::mat4(1.f));
+	LineRender line3(P6::MyVector(Pos3X, 200, 0), particle3.Position, glm::mat4(1.f));
+	LineRender line4(P6::MyVector(Pos4X, 200, 0), particle4.Position, glm::mat4(1.f));
+	LineRender line5(P6::MyVector(Pos5X, 200, 0), particle5.Position, glm::mat4(1.f));
+
 
     FallingNCradle* fNC1 = new FallingNCradle(P6::MyVector(Pos1X, 200, 0), cableLength);
     fNC1->SetParticle(&particle);
@@ -509,7 +517,7 @@ int main(void)
             if (forceApplied)
             {
                 //particle.AddForce(P6::MyVector(pushX, pushY, pushZ)); //Apply force to the first particle
-                particle.AddForce(P6::MyVector(-100000, 0, 0)); //-100, 0, 0
+                particle.AddForce(P6::MyVector(-10000, 0, 0)); //-100, 0, 0
                 forceApplied = false;
             }
 

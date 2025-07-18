@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="P6\LineRender.cpp" />
     <ClCompile Include="P6\FallingNCradle.cpp" />
     <ClCompile Include="P6\Chain.cpp" />
     <ClCompile Include="P6\Bungee.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="P6\LineRender.h" />
     <ClInclude Include="P6\FallingNCradle.h" />
     <ClInclude Include="P6\Chain.h" />
     <ClInclude Include="P6\Bungee.h" />

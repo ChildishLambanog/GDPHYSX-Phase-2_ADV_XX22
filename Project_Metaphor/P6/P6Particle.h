@@ -14,7 +14,7 @@ namespace P6 {
 			MyVector Velocity;
 			MyVector Acceleration;
 
-			float damping = 0.9f; //Approximate drag 0.9f
+			float damping = 0.95f; //Approximate drag 0.9f
 
 			P6Particle(float x, float y, float z) : Position(x, y, z), Velocity(0, 0, 0), Acceleration(0, 0, 0) {}
 		protected:

@@ -3,7 +3,7 @@
 OrthoCamera::OrthoCamera(glm::vec3 pos, float width, float height) : Camera(pos)
 {
     float aspect = width / height;
-    float orthoHeight = 1000.0f;
+    float orthoHeight = 800.0f;
     float orthoWidth = orthoHeight * aspect;
 
     this->projection = glm::ortho(
