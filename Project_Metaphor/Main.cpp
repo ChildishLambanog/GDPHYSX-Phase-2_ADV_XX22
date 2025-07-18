@@ -450,23 +450,34 @@ int main(void)
 	main_object4.setScale(glm::vec3(particle4.radius, particle4.radius, particle4.radius));
 	main_object5.setScale(glm::vec3(particle5.radius, particle5.radius, particle5.radius));
 
-    FallingNCradle fNC1 = FallingNCradle(P6::MyVector(Pos1X, 200, 0), cableLength);
-    FallingNCradle fNC2 = FallingNCradle(P6::MyVector(Pos2X, 200, 0), cableLength);
-    FallingNCradle fNC3 = FallingNCradle(P6::MyVector(Pos3X, 200, 0), cableLength);
-    FallingNCradle fNC4 = FallingNCradle(P6::MyVector(Pos4X, 200, 0), cableLength);
-    FallingNCradle fNC5 = FallingNCradle(P6::MyVector(Pos5X, 200, 0), cableLength);
+    FallingNCradle* fNC1 = new FallingNCradle(P6::MyVector(Pos1X, 200, 0), cableLength);
+    fNC1->SetParticle(&particle);
+    FallingNCradle* fNC2 = new FallingNCradle(P6::MyVector(Pos2X, 200, 0), cableLength);
+    fNC2->SetParticle(&particle2);
+    FallingNCradle* fNC3 = new FallingNCradle(P6::MyVector(Pos3X, 200, 0), cableLength);
+    fNC3->SetParticle(&particle3);
+    FallingNCradle* fNC4 = new FallingNCradle(P6::MyVector(Pos4X, 200, 0), cableLength);
+    fNC4->SetParticle(&particle4);
+    FallingNCradle* fNC5 = new FallingNCradle(P6::MyVector(Pos5X, 200, 0), cableLength);
+    fNC5->SetParticle(&particle5);
 
-	Chain chain1 = Chain(P6::MyVector(Pos1X, 200, 0), cableLength);
-	Chain chain2 = Chain(P6::MyVector(Pos2X, 200, 0), cableLength);
-	Chain chain3 = Chain(P6::MyVector(Pos3X, 200, 0), cableLength);
-	Chain chain4 = Chain(P6::MyVector(Pos4X, 200, 0), cableLength);
-	Chain chain5 = Chain(P6::MyVector(Pos5X, 200, 0), cableLength);
+	//Chain chain1 = Chain(P6::MyVector(Pos1X, 200, 0), cableLength);
+	//Chain chain2 = Chain(P6::MyVector(Pos2X, 200, 0), cableLength);
+	//Chain chain3 = Chain(P6::MyVector(Pos3X, 200, 0), cableLength);
+	//Chain chain4 = Chain(P6::MyVector(Pos4X, 200, 0), cableLength);
+	//Chain chain5 = Chain(P6::MyVector(Pos5X, 200, 0), cableLength);
 
-    pWorld.forceRegistry.Add(&particle, &fNC1);
-	pWorld.forceRegistry.Add(&particle2, &fNC2);
-	pWorld.forceRegistry.Add(&particle3, &fNC3);
-	pWorld.forceRegistry.Add(&particle4, &fNC4);
-	pWorld.forceRegistry.Add(&particle5, &fNC5);
+	pWorld.Links.push_back(fNC1);
+	pWorld.Links.push_back(fNC2);
+	pWorld.Links.push_back(fNC3);
+	pWorld.Links.push_back(fNC4);
+	pWorld.Links.push_back(fNC5);
+
+    //pWorld.forceRegistry.Add(&particle, &fNC1);
+	//pWorld.forceRegistry.Add(&particle2, &fNC2);
+	//pWorld.forceRegistry.Add(&particle3, &fNC3);
+	//pWorld.forceRegistry.Add(&particle4, &fNC4);
+	//pWorld.forceRegistry.Add(&particle5, &fNC5);
 
 	/*pWorld.forceRegistry.Add(&particle, &chain1);
 	pWorld.forceRegistry.Add(&particle2, &chain2);
@@ -498,7 +509,7 @@ int main(void)
             if (forceApplied)
             {
                 //particle.AddForce(P6::MyVector(pushX, pushY, pushZ)); //Apply force to the first particle
-                particle.AddForce(P6::MyVector(-100, 0, 0));
+                particle.AddForce(P6::MyVector(-100000, 0, 0)); //-100, 0, 0
                 forceApplied = false;
             }
 

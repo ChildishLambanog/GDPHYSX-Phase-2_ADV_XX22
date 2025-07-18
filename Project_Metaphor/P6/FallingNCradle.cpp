@@ -19,39 +19,70 @@
 //    particle->Velocity -= direction * particle->Velocity.dotProduct(direction);
 //}
 
-void FallingNCradle::UpdateForce(P6Particle* particle, float time)
+//void FallingNCradle::UpdateForce(P6Particle* particle, float time)
+//{
+//    //MyVector pos = particle->Position;
+//    //MyVector force = pos - anchorPoint;
+//    //float mag = force.magnitude();
+//
+//    //// Allow particle to naturally fall under gravity
+//    //if (mag < restLength)
+//    //{
+//    //    return; // Do nothing, rod is slack
+//    //}
+//
+//    //// Once the particle reaches/exceeds restLength,
+//    //// "attach" it to a rigid rod
+//    //MyVector direction = force.normalize();
+//    //particle->Position = anchorPoint + (direction * restLength);
+//
+//    //// Remove velocity component away from rod to avoid snapping
+//    //particle->Velocity -= direction * particle->Velocity.dotProduct(direction);
+//
+//    MyVector toParticle = particle->Position - anchorPoint;
+//    float dist = toParticle.magnitude();
+//
+//    if (dist == 0.0f) return;
+//
+//    if (dist > restLength)
+//    {
+//        // Constrain position to the circle of restLength
+//        MyVector dir = toParticle * (1.0f/ dist);
+//        particle->Position = anchorPoint + dir * restLength;
+//
+//        // Now constrain velocity to be tangential
+//        MyVector radial = dir * (particle->Velocity.dotProduct(dir));
+//        particle->Velocity -= radial; // remove radial component
+//    }
+//}
+
+ParticleContact* FallingNCradle::GetContact()
 {
-    //MyVector pos = particle->Position;
-    //MyVector force = pos - anchorPoint;
-    //float mag = force.magnitude();
+	float currentLength = CurrentLength();
 
-    //// Allow particle to naturally fall under gravity
-    //if (mag < restLength)
-    //{
-    //    return; // Do nothing, rod is slack
-    //}
+	if (currentLength <= restLength)
+	{
+		return nullptr;
+	}
 
-    //// Once the particle reaches/exceeds restLength,
-    //// "attach" it to a rigid rod
-    //MyVector direction = force.normalize();
-    //particle->Position = anchorPoint + (direction * restLength);
+	ParticleContact* ret = new ParticleContact();
+	ret->particles[0] = particles[0];
 
-    //// Remove velocity component away from rod to avoid snapping
-    //particle->Velocity -= direction * particle->Velocity.dotProduct(direction);
+	MyVector direction = anchorPoint - particles[0]->Position;
+	direction = direction.normalize();
 
-    MyVector toParticle = particle->Position - anchorPoint;
-    float dist = toParticle.magnitude();
+	if (currentLength > restLength)
+	{
+		ret->contactNormal = direction;
+		ret->depth = currentLength - restLength;
+	}
 
-    if (dist == 0.0f) return;
+	ret->restitution = restitution;
+	return ret;
+}
 
-    if (dist > restLength)
-    {
-        // Constrain position to the circle of restLength
-        MyVector dir = toParticle * (1.0f/ dist);
-        particle->Position = anchorPoint + dir * restLength;
-
-        // Now constrain velocity to be tangential
-        MyVector radial = dir * (particle->Velocity.dotProduct(dir));
-        particle->Velocity -= radial; // remove radial component
-    }
+float FallingNCradle::CurrentLength()
+{
+	MyVector ret = anchorPoint - particles[0]->Position;
+	return ret.magnitude();
 }
